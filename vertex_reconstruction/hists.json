@@ -1,0 +1,169 @@
+{
+  "1d_hists": [
+    {
+      "name" : "hEndXDiffEl",
+      "type": "TH1D",
+      "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
+      "bins": 50,
+      "u_lim": 200,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndYDiffEl",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Y;True - Reco EndY [cm];Count",
+      "bins": 70,
+      "u_lim": 400,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndZDiffEl",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndXDiffGa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
+      "bins": 50,
+      "u_lim": 200,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndYDiffGa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Y;True - Reco EndY [cm];Count",
+      "bins": 70,
+      "u_lim": 400,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndZDiffGa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndXDiffMu",
+      "type": "TH1D",
+      "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
+      "bins": 50,
+      "u_lim": 200,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndYDiffMu",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Y;True - Reco EndY [cm];Count",
+      "bins": 70,
+      "u_lim": 400,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndZDiffMu",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndXDiffPi",
+      "type": "TH1D",
+      "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
+      "bins": 50,
+      "u_lim": 200,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndYDiffPi",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Y;True - Reco EndY [cm];Count",
+      "bins": 70,
+      "u_lim": 400,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndZDiffPi",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndXDiffKa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
+      "bins": 50,
+      "u_lim": 200,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndYDiffKa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Y;True - Reco EndY [cm];Count",
+      "bins": 70,
+      "u_lim": 400,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndZDiffKa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndXDiffPro",
+      "type": "TH1D",
+      "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
+      "bins": 50,
+      "u_lim": 200,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndYDiffPro",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Y;True - Reco EndY [cm];Count",
+      "bins": 70,
+      "u_lim": 400,
+      "l_lim": -300
+    },
+    {
+      "name" : "hEndZDiffPro",
+      "type": "TH1D",
+      "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hTrueBeamPdg",
+      "type": "TH1I",
+      "axes": "True Beam PDG;PDG;Count",
+      "bins": 100,
+      "u_lim": -1,
+      "l_lim": 0
+    }
+  ],
+  "2d_hists": [
+    {
+      "name" : "Example 2D Histo",
+      "type": "TH2I",
+      "axes": "<Title>>;<X-axis>>;<Y-axis>>",
+      "xbins": 10,
+      "ybins": 10,
+      "xu_lim": 10,
+      "xl_lim": 0,
+      "yu_lim": 10,
+      "yl_lim": 0
+    }
+  ]
+}
