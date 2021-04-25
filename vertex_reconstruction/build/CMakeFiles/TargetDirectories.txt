@@ -1,3 +1,0 @@
-/Users/jsen/tmp/pion_qe/studies/vertex_reconstruction/build/CMakeFiles/rebuild_cache.dir
-/Users/jsen/tmp/pion_qe/studies/vertex_reconstruction/build/CMakeFiles/edit_cache.dir
-/Users/jsen/tmp/pion_qe/studies/vertex_reconstruction/build/CMakeFiles/reco_vtx_study.dir
