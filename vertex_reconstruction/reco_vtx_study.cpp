@@ -3,6 +3,7 @@
 //
 
 #include "reco_vtx_study.h"
+#include "../utilities/Utilities.hpp"
 #include "TTree.h"
 #include <iostream>
 
@@ -43,6 +44,8 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
     double delta_x = true_beam_endX - reco_beam_endX;
     double delta_y = true_beam_endY - reco_beam_endY;
     double delta_z = true_beam_endZ - reco_beam_endZ;
+    double delta_r = utils::Distance(true_beam_endX,true_beam_endY,true_beam_endZ)
+                   - utils::Distance(reco_beam_endX,reco_beam_endY,reco_beam_endZ);
 
     hists.th1_hists["hTrueBeamPdg"] -> Fill( true_beam_PDG );
 
@@ -52,31 +55,37 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
         hists.th1_hists["hEndXDiffEl"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffEl"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffEl"] -> Fill( delta_z );
+        hists.th1_hists["hEndRDiffEl"] -> Fill( delta_r );
         break;
       case utils::pdg::kPdgGamma :
         hists.th1_hists["hEndXDiffGa"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffGa"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffGa"] -> Fill( delta_z );
+        hists.th1_hists["hEndRDiffGa"] -> Fill( delta_r );
         break;
       case utils::pdg::kPdgMuon :
         hists.th1_hists["hEndXDiffMu"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffMu"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffMu"] -> Fill( delta_z );
+        hists.th1_hists["hEndRDiffMu"] -> Fill( delta_r );
         break;
       case utils::pdg::kPdgPiP :
         hists.th1_hists["hEndXDiffPi"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffPi"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffPi"] -> Fill( delta_z );
+        hists.th1_hists["hEndRDiffPi"] -> Fill( delta_r );
         break;
       case utils::pdg::kPdgKP :
         hists.th1_hists["hEndXDiffKa"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffKa"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffKa"] -> Fill( delta_z );
+        hists.th1_hists["hEndRDiffKa"] -> Fill( delta_r );
         break;
       case utils::pdg::kPdgProton :
         hists.th1_hists["hEndXDiffPro"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffPro"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffPro"] -> Fill( delta_z );
+        hists.th1_hists["hEndRDiffPro"] -> Fill( delta_r );
         break;
       default :
         std::cout << "Missed PDG " << true_beam_PDG << std::endl;
@@ -88,9 +97,9 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
 
 int main() {
 
-  std::string input_file = "../../pionana_Prod4_mc_1GeV_1_14_21.root";
+  std::string input_file = "../../../pionana_Prod4_mc_1GeV_1_14_21.root";
   TString output_file = "out.root";
-  std::string hists_config = "hists.json";
+  std::string hists_config = "../hists.json";
 
   // Configure histograms
   Histograms hists;

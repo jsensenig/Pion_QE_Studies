@@ -25,6 +25,14 @@
       "l_lim": -700
     },
     {
+      "name" : "hEndRDiffEl",
+      "type": "TH1D",
+      "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
       "name" : "hEndXDiffGa",
       "type": "TH1D",
       "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
@@ -44,6 +52,14 @@
       "name" : "hEndZDiffGa",
       "type": "TH1D",
       "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndRDiffGa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
       "u_lim": 300,
       "l_lim": -700
@@ -73,6 +89,14 @@
       "l_lim": -700
     },
     {
+      "name" : "hEndRDiffMu",
+      "type": "TH1D",
+      "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
       "name" : "hEndXDiffPi",
       "type": "TH1D",
       "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
@@ -92,6 +116,14 @@
       "name" : "hEndZDiffPi",
       "type": "TH1D",
       "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndRDiffPi",
+      "type": "TH1D",
+      "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
       "u_lim": 300,
       "l_lim": -700
@@ -121,6 +153,14 @@
       "l_lim": -700
     },
     {
+      "name" : "hEndRDiffKa",
+      "type": "TH1D",
+      "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
       "name" : "hEndXDiffPro",
       "type": "TH1D",
       "axes": "Vertex #Delta X;True - Reco EndX [cm];Count",
@@ -140,6 +180,14 @@
       "name" : "hEndZDiffPro",
       "type": "TH1D",
       "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
+      "bins": 100,
+      "u_lim": 300,
+      "l_lim": -700
+    },
+    {
+      "name" : "hEndRDiffPro",
+      "type": "TH1D",
+      "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
       "u_lim": 300,
       "l_lim": -700

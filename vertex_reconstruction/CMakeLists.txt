@@ -11,6 +11,7 @@ add_executable( reco_vtx_study
         CMakeLists.txt
         reco_vtx_study.cpp
         reco_vtx_study.h
+        ../utilities/Utilities.hpp
         ../utilities/Histograms.cpp
         ../utilities/Histograms.hpp)
 
