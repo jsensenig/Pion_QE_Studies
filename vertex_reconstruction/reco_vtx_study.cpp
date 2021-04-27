@@ -121,7 +121,9 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
 
   }
 
+  // Clean up
   delete true_beam_endProcess;
+  proc_file -> Close();
 
 }
 
