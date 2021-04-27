@@ -26,6 +26,12 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
   double reco_beam_endX;
   double reco_beam_endY;
   double reco_beam_endZ;
+  double reco_beam_startX;
+  double reco_beam_startY;
+  double reco_beam_startZ;
+  double reco_beam_len;
+  int reco_beam_type;
+  std::string *true_beam_endProcess = new std::string;
 
   tree->SetBranchAddress("true_beam_PDG", &true_beam_PDG);
   tree->SetBranchAddress("true_beam_endX", &true_beam_endX);
@@ -34,6 +40,13 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
   tree->SetBranchAddress("reco_beam_endX", &reco_beam_endX);
   tree->SetBranchAddress("reco_beam_endY", &reco_beam_endY);
   tree->SetBranchAddress("reco_beam_endZ", &reco_beam_endZ);
+  tree->SetBranchAddress("reco_beam_len", &reco_beam_len);
+  tree->SetBranchAddress("reco_beam_type", &reco_beam_type);
+  tree->SetBranchAddress("reco_beam_startX", &reco_beam_startX);
+  tree->SetBranchAddress("reco_beam_startY", &reco_beam_startY);
+  tree->SetBranchAddress("reco_beam_startZ", &reco_beam_startZ);
+
+  tree->SetBranchAddress("true_beam_endProcess", &true_beam_endProcess);
 
   size_t nevts = tree -> GetEntries();
   std::cout << "Processing " << nevts << " events." << std::endl;
@@ -48,6 +61,14 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
                    - utils::Distance(reco_beam_endX,reco_beam_endY,reco_beam_endZ);
 
     hists.th1_hists["hTrueBeamPdg"] -> Fill( true_beam_PDG );
+
+    // The End Z = -1 makes a bump in delta R at about 430cm (because reco event is wrongly classified as shower)
+    if( true_beam_PDG == 211 && reco_beam_endZ == -1 ) {
+      std::cout << "Reco Start X,Y,Z = " << reco_beam_startX << "," << reco_beam_startY << "," << reco_beam_startZ << std::endl;
+      std::cout << "Reco End X,Y,Z = " << reco_beam_endX << "," << reco_beam_endY << "," << reco_beam_endZ
+                << " Len " << reco_beam_len << " Beam Type " << reco_beam_type << std::endl;
+      continue;
+    }
 
     // Fill the histograms per particle code 
     switch ( abs(true_beam_PDG) ) {
@@ -70,6 +91,13 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
         hists.th1_hists["hEndRDiffMu"] -> Fill( delta_r );
         break;
       case utils::pdg::kPdgPiP :
+        if( delta_r > 350 ) {
+          hists.th1_hists["hEndProcPi"] -> Fill( true_beam_endProcess->c_str(), 1 );
+          hists.th1_hists["hEndZTruePi"] -> Fill( true_beam_endZ );
+          hists.th1_hists["hEndZRecoPi"] -> Fill( reco_beam_endZ );
+        }
+        hists.th1_hists["hEndZTrueAllPi"] -> Fill( true_beam_endZ );
+        hists.th1_hists["hEndZRecoAllPi"] -> Fill( reco_beam_endZ );
         hists.th1_hists["hEndXDiffPi"] -> Fill( delta_x );
         hists.th1_hists["hEndYDiffPi"] -> Fill( delta_y );
         hists.th1_hists["hEndZDiffPi"] -> Fill( delta_z );
@@ -92,6 +120,8 @@ void run_reco_vertex( std::string in_file, Histograms &hists ) {
     }
 
   }
+
+  delete true_beam_endProcess;
 
 }
 

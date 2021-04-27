@@ -29,8 +29,8 @@
       "type": "TH1D",
       "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
-      "u_lim": 300,
-      "l_lim": -700
+      "u_lim": 600,
+      "l_lim": -600
     },
     {
       "name" : "hEndXDiffGa",
@@ -61,8 +61,8 @@
       "type": "TH1D",
       "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
-      "u_lim": 300,
-      "l_lim": -700
+      "u_lim": 600,
+      "l_lim": -600
     },
     {
       "name" : "hEndXDiffMu",
@@ -93,8 +93,8 @@
       "type": "TH1D",
       "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
-      "u_lim": 300,
-      "l_lim": -700
+      "u_lim": 600,
+      "l_lim": -600
     },
     {
       "name" : "hEndXDiffPi",
@@ -116,17 +116,49 @@
       "name" : "hEndZDiffPi",
       "type": "TH1D",
       "axes": "Vertex #Delta Z;True - Reco EndZ [cm];Count",
-      "bins": 100,
-      "u_lim": 300,
+      "bins": 120,
+      "u_lim": 500,
       "l_lim": -700
+    },
+    {
+      "name" : "hEndZTruePi",
+      "type": "TH1D",
+      "axes": "Vertex True End Z;True EndZ [cm];Count",
+      "bins": 175,
+      "u_lim": 600,
+      "l_lim": -100
+    },
+    {
+      "name" : "hEndZRecoPi",
+      "type": "TH1D",
+      "axes": "Vertex Reco End Z;Reco EndZ [cm];Count",
+      "bins": 175,
+      "u_lim": 600,
+      "l_lim": -100
+    },
+    {
+      "name" : "hEndZTrueAllPi",
+      "type": "TH1D",
+      "axes": "Vertex True End Z;True EndZ [cm];Count",
+      "bins": 150,
+      "u_lim": 500,
+      "l_lim": -100
+    },
+    {
+      "name" : "hEndZRecoAllPi",
+      "type": "TH1D",
+      "axes": "Vertex Reco End Z;Reco EndZ [cm];Count",
+      "bins": 150,
+      "u_lim": 500,
+      "l_lim": -100
     },
     {
       "name" : "hEndRDiffPi",
       "type": "TH1D",
       "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
-      "bins": 100,
-      "u_lim": 300,
-      "l_lim": -700
+      "bins": 1200,
+      "u_lim": 600,
+      "l_lim": -600
     },
     {
       "name" : "hEndXDiffKa",
@@ -157,8 +189,8 @@
       "type": "TH1D",
       "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
-      "u_lim": 300,
-      "l_lim": -700
+      "u_lim": 600,
+      "l_lim": -600
     },
     {
       "name" : "hEndXDiffPro",
@@ -189,14 +221,22 @@
       "type": "TH1D",
       "axes": "Vertex #Delta R;True - Reco EndR [cm];Count",
       "bins": 100,
-      "u_lim": 300,
-      "l_lim": -700
+      "u_lim": 600,
+      "l_lim": -600
     },
     {
       "name" : "hTrueBeamPdg",
       "type": "TH1I",
       "axes": "True Beam PDG;PDG;Count",
       "bins": 100,
+      "u_lim": -1,
+      "l_lim": 0
+    },
+    {
+      "name" : "hEndProcPi",
+      "type": "TH1D",
+      "axes": "True Beam End Process (#Delta R > 350cm);Process;Count",
+      "bins": 5,
       "u_lim": -1,
       "l_lim": 0
     }
