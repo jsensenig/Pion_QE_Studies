@@ -87,6 +87,30 @@
       "bins": 50,
       "u_lim": 1000.0,
       "l_lim": 0.0
+    },
+    {
+      "name" : "hEloss350",
+      "type": "TH1D",
+      "axes": "Enegy Loss #omega (q < 350); #omega [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hEloss450",
+      "type": "TH1D",
+      "axes": "Enegy Loss #omega (350 < q < 650); #omega [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hEloss650",
+      "type": "TH1D",
+      "axes": "Enegy Loss #omega (q > 650); #omega [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
     }
   ],
   "2d_hists": [

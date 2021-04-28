@@ -176,10 +176,17 @@ namespace utils {
   // Calculate kinetic energy for a given momentum and mass
   static double CalculateKE( const double p, const double m ) {
 
-    return sqrt( pow( p, 2 ) + pow( m, 2 )) - m;
+    return sqrt( pow( p, 2 ) + pow( m, 2 ) ) - m;
 
   }
 
+  //-------------------------------------------------------------
+  // Calculate kinetic energy for a given momentum and mass
+  static double CalculateE( const double p, const double m ) {
+                                                                  
+    return sqrt( pow( p, 2 ) + pow( m, 2 ) );
+                                                                  
+  }
 
   // Template function to count the occurrence of a specified TTree array elements
   //----------------------------------------------------------------

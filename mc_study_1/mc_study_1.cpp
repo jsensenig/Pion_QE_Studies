@@ -43,6 +43,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
   std::vector<double> *true_beam_daughter_startPx = new std::vector<double>;
   std::vector<double> *true_beam_daughter_startPy = new std::vector<double>;
   std::vector<double> *true_beam_daughter_startPz = new std::vector<double>;
+  std::vector<double> *true_beam_daughter_startP = new std::vector<double>;
   std::vector<int> *true_beam_daughter_PDG = new std::vector<int>;
 
 
@@ -72,6 +73,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
   tree->SetBranchAddress("true_beam_daughter_startPy", &true_beam_daughter_startPy);
   tree->SetBranchAddress("true_beam_daughter_startPz", &true_beam_daughter_startPz);
   tree->SetBranchAddress("true_beam_endP", &true_beam_endP);
+  tree->SetBranchAddress("true_beam_daughter_startP", &true_beam_daughter_startP);
 
 
   size_t nevts = tree -> GetEntries();
@@ -97,6 +99,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
 
     }
 
+    // Define the pi+ event signature
     bool true_qe = true_beam_endProcess->compare("pi+Inelastic") == 0 &&
                    true_daughter_nPiPlus == 1 &&
                    true_daughter_nPiMinus == 0 &&
@@ -106,24 +109,37 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
     // Only look at true QE events
     if( !true_qe ) continue;
 
+    // Get the index of the pion daughter
+    int pi_idx = utils::FindIndex( *true_beam_daughter_PDG, utils::pdg::kPdgPiP );
+
     // Nucleon multiplicity
     hists.th2_hists["hnProtonNeutron"] -> Fill( true_daughter_nProton, true_daughter_nNeutron );
 
     // Scattering angle of the daughter pion
-    int pi_idx = utils::FindIndex( *true_beam_daughter_PDG, utils::pdg::kPdgPiP );
     double pi_angle = scatter_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
                       true_beam_daughter_startPx->at(pi_idx), true_beam_daughter_startPy->at(pi_idx),
                       true_beam_daughter_startPz->at(pi_idx));
     hists.th1_hists["hPiAngle"] -> Fill( pi_angle );
     hists.th1_hists["hPiCosAngle"] -> Fill( TMath::Cos(pi_angle) );
 
-    // Only pi QE events
+    // Only pi QE events KE
     hists.th1_hists["hPiQeKe"] -> Fill( pi_ke );
     hists.th1_hists["hFracPiQeKe"] -> Fill( pi_ke );
+
+    // --> Calculate the energy loss, omega
+    // Initial and final pion energy
+    double pi_intial_e = utils::CalculateE( true_beam_endP*1.e3, utils::pdg::pdg2mass(utils::pdg::kPdgPiP) );
+    double pi_final_e = utils::CalculateE( true_beam_daughter_startP->at(pi_idx)*1.e3, utils::pdg::pdg2mass(utils::pdg::kPdgPiP) );
+    // Initial and final pion 4-vectors
+    TLorentzVector k_in( true_beam_endPx*1.e3, true_beam_endPy*1.e3, true_beam_endPz*1.e3, pi_intial_e );
+    TLorentzVector k_out( true_beam_daughter_startPx->at(pi_idx)*1.e3 , true_beam_daughter_startPy->at(pi_idx)*1.e3,
+                          true_beam_daughter_startPz->at(pi_idx)*1.e3, pi_final_e );
+    calculate_energy_loss( k_in, k_out, hists );
 
   }
 
   // Divide pi QE / all pi In-elastic histograms to get fraction of pion QE events
+  // Use get() to access the histogram's raw pointer from unique_ptr when using Divide()
   hists.th1_hists["hFracPiQeKe"] -> Divide( hists.th1_hists["hPiInElKe"].get() );
 
   // Clean up
@@ -133,6 +149,21 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
   delete true_beam_daughter_startPy;
   delete true_beam_daughter_startPz;
   proc_file -> Close();
+
+}
+
+void calculate_energy_loss( TLorentzVector &k_in, TLorentzVector &k_out, Histograms &hists ) {
+
+  TLorentzVector qvec = k_in - k_out;
+  double q = qvec.Vect().Mag();
+
+  if( q < 350. ) {
+    hists.th1_hists["hEloss350"] -> Fill( qvec.E() );
+  } else if( 350. < q && q < 650. ) {
+    hists.th1_hists["hEloss450"] -> Fill( qvec.E() );
+  } else if( q > 650 ) {
+    hists.th1_hists["hEloss650"] -> Fill( qvec.E() );
+  }
 
 }
 
