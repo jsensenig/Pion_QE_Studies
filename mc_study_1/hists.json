@@ -1,0 +1,105 @@
+{
+  "1d_hists": [
+    {
+      "name" : "hPrimaryPdg",
+      "type": "TH1I",
+      "axes": "Primary PDG;PDG;Count",
+      "bins": 300,
+      "u_lim": 3000,
+      "l_lim": -300
+    },
+    {
+      "name" : "hDaughterPiP",
+      "type": "TH1I",
+      "axes": "Daughter #pi^+;n;Count",
+      "bins": 15,
+      "u_lim": 15,
+      "l_lim": 0
+    },
+    {
+      "name" : "hDaughterPiM",
+      "type": "TH1I",
+      "axes": "Daughter #pi^-;n;Count",
+      "bins": 15,
+      "u_lim": 15,
+      "l_lim": 0
+    },
+    {
+      "name" : "hDaughterPi0",
+      "type": "TH1I",
+      "axes": "Daughter #pi^0;n;Count",
+      "bins": 15,
+      "u_lim": 15,
+      "l_lim": 0
+    },
+    {
+      "name" : "hDaughterP",
+      "type": "TH1I",
+      "axes": "Daughter Proton;n;Count",
+      "bins": 15,
+      "u_lim": 15,
+      "l_lim": 0
+    },
+    {
+      "name" : "hDaughterN",
+      "type": "TH1I",
+      "axes": "Daughter N;n;Count",
+      "bins": 15,
+      "u_lim": 15,
+      "l_lim": 0
+    },
+    {
+      "name" : "hPiAngle",
+      "type": "TH1D",
+      "axes": "Daughter #pi Scattering Angle; Angle [rad];Count",
+      "bins": 32,
+      "u_lim": 3.2,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hPiCosAngle",
+      "type": "TH1D",
+      "axes": "Daughter #pi Scattering Cos Angle; Cos Angle;Count",
+      "bins": 40,
+      "u_lim": 1.0,
+      "l_lim": -1.0
+    },
+    {
+      "name" : "hPiQeKe",
+      "type": "TH1D",
+      "axes": "All QE #pi Kinetic Energy; KE [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hPiInElKe",
+      "type": "TH1D",
+      "axes": "All Inelastic #pi Kinetic Energy; KE [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hFracPiQeKe",
+      "type": "TH1D",
+      "axes": "Fraction QE #pi Kinetic Energy; KE [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    }
+  ],
+  "2d_hists": [
+    {
+      "name" : "hnProtonNeutron",
+      "type": "TH2I",
+      "axes": "#pi QE True Daughter Nucleons;nProton;nNeutron",
+      "xbins": 15,
+      "ybins": 15,
+      "xu_lim": 15,
+      "xl_lim": 0,
+      "yu_lim": 15,
+      "yl_lim": 0
+    }
+  ]
+}

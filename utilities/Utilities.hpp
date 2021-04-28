@@ -62,6 +62,7 @@ namespace utils {
 
     }
 
+    // Mass in units MeV/c
     static double pdg2mass( int p ) {
 
       switch ( p ) {
@@ -201,17 +202,17 @@ namespace utils {
 //
 //  }
 
-  // Template function to find and return an element index in a TTree array
-  //----------------------------------------------------------------
-//  template<typename T>
-//  int FindIndex( TTreeReaderArray<T> & arr, T a ) {
-//
-//    auto it = std::find( arr.begin(), arr.end(), a );
-//
-//    if ( it != arr.end()) return it - arr.begin();
-//    else return -1;
-//
-//  }
+// Template function to find and return an element index in a TTree array
+//----------------------------------------------------------------
+  template<typename T>
+  int FindIndex( std::vector<T> & vec, T a ) {
+
+    auto it = std::find( vec.begin(), vec.end(), a );
+
+    if ( it != vec.end()) return it - vec.begin();
+    else return -1;
+
+  }
 
   // Template function to find and return an element index in a TTree array
   //----------------------------------------------------------------
