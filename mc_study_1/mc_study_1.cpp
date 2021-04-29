@@ -21,16 +21,10 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
   TTree* tree = (TTree*)proc_file -> Get("pionana/beamana");
 
   int true_beam_PDG;
-  double true_beam_endX;
-  double true_beam_endY;
-  double true_beam_endZ;
   double true_beam_endP;
-  double reco_beam_endX;
-  double reco_beam_endY;
-  double reco_beam_endZ;
-  double reco_beam_startX;
-  double reco_beam_startY;
-  double reco_beam_startZ;
+  double true_beam_endX, true_beam_endY, true_beam_endZ;
+  double reco_beam_endX, reco_beam_endY, reco_beam_endZ;
+  double reco_beam_startX, reco_beam_startY, reco_beam_startZ;
   double reco_beam_len;
   int reco_beam_type;
   int true_daughter_nNeutron;
@@ -83,6 +77,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
     tree->GetEntry( i );
 
     double pi_ke = -1;
+    hists.th1_hists["hPrimaryEndProc"] -> Fill( true_beam_endProcess->c_str(), 1 );
 
     // Check what is included in the definition of the "pi+inelastic"
     if( true_beam_endProcess->compare("pi+Inelastic") == 0 ) {
@@ -96,6 +91,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
       // All in-elastic pi events
       pi_ke = utils::CalculateKE( true_beam_endP*1.e3, utils::pdg::pdg2mass(utils::pdg::kPdgPiP) );
       hists.th1_hists["hPiInElKe"] -> Fill( pi_ke );
+      hists.th1_hists["hPiInElP"] -> Fill( true_beam_endP*1.e3 );
 
     }
 
@@ -115,16 +111,31 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
     // Nucleon multiplicity
     hists.th2_hists["hnProtonNeutron"] -> Fill( true_daughter_nProton, true_daughter_nNeutron );
 
-    // Scattering angle of the daughter pion
-    double pi_angle = scatter_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
-                      true_beam_daughter_startPx->at(pi_idx), true_beam_daughter_startPy->at(pi_idx),
-                      true_beam_daughter_startPz->at(pi_idx));
-    hists.th1_hists["hPiAngle"] -> Fill( pi_angle );
-    hists.th1_hists["hPiCosAngle"] -> Fill( TMath::Cos(pi_angle) );
+    // Loop over true beam daughters
+    for( size_t i = 0; i < true_beam_daughter_startPx->size(); i++ ) {
+
+      double angle = scatter_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
+                                    true_beam_daughter_startPx->at( i ),
+                                    true_beam_daughter_startPy->at( i ),
+                                    true_beam_daughter_startPz->at( i ));
+
+      if( true_beam_daughter_PDG->at(i) == utils::pdg::kPdgPiP ) {
+        // Scattering angle of the daughter pion
+        hists.th1_hists["hPiAngle"]->Fill( angle );
+        hists.th1_hists["hPiCosAngle"]->Fill( TMath::Cos( angle ));
+      } else if( true_beam_daughter_PDG->at(i) == utils::pdg::kPdgProton ) {
+        // Scattering angle of the daughter proton
+        hists.th1_hists["hProtonAngle"] -> Fill( angle );
+      } else if( true_beam_daughter_PDG->at(i) == utils::pdg::kPdgNeutron ) {
+        // Scattering angle of the daughter proton
+        hists.th1_hists["hNeutronAngle"] -> Fill( angle );
+      }
+    }
 
     // Only pi QE events KE
     hists.th1_hists["hPiQeKe"] -> Fill( pi_ke );
     hists.th1_hists["hFracPiQeKe"] -> Fill( pi_ke );
+    hists.th1_hists["hFracPiQeP"] -> Fill( true_beam_endP*1.e3 );
 
     // --> Calculate the energy loss, omega
     // Initial and final pion energy
@@ -141,6 +152,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
   // Divide pi QE / all pi In-elastic histograms to get fraction of pion QE events
   // Use get() to access the histogram's raw pointer from unique_ptr when using Divide()
   hists.th1_hists["hFracPiQeKe"] -> Divide( hists.th1_hists["hPiInElKe"].get() );
+  hists.th1_hists["hFracPiQeP"] -> Divide( hists.th1_hists["hPiInElP"].get() );
 
   // Clean up
   delete true_beam_endProcess;
@@ -148,6 +160,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
   delete true_beam_daughter_startPx;
   delete true_beam_daughter_startPy;
   delete true_beam_daughter_startPz;
+  delete true_beam_daughter_startP;
   proc_file -> Close();
 
 }

@@ -9,6 +9,14 @@
       "l_lim": -300
     },
     {
+      "name" : "hPrimaryEndProc",
+      "type": "TH1I",
+      "axes": "Primary Beam End Process;End Proc;Count",
+      "bins": 10,
+      "u_lim": 10,
+      "l_lim": 0
+    },
+    {
       "name" : "hDaughterPiP",
       "type": "TH1I",
       "axes": "Daughter #pi^+;n;Count",
@@ -49,6 +57,22 @@
       "l_lim": 0
     },
     {
+      "name" : "hProtonAngle",
+      "type": "TH1D",
+      "axes": "Daughter Proton Scattering Angle; Angle [rad];Count",
+      "bins": 32,
+      "u_lim": 3.2,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hNeutronAngle",
+      "type": "TH1D",
+      "axes": "Daughter Neutron Scattering Angle; Angle [rad];Count",
+      "bins": 32,
+      "u_lim": 3.2,
+      "l_lim": 0.0
+    },
+    {
       "name" : "hPiAngle",
       "type": "TH1D",
       "axes": "Daughter #pi Scattering Angle; Angle [rad];Count",
@@ -81,11 +105,27 @@
       "l_lim": 0.0
     },
     {
+      "name" : "hPiInElP",
+      "type": "TH1D",
+      "axes": "All Inelastic #pi Momentum; P [MeV];Count",
+      "bins": 60,
+      "u_lim": 1200.0,
+      "l_lim": 0.0
+    },
+    {
       "name" : "hFracPiQeKe",
       "type": "TH1D",
-      "axes": "Fraction QE #pi Kinetic Energy; KE [MeV];Count",
+      "axes": "Fraction QE #pi Kinetic Energy; KE [MeV];Fraction",
       "bins": 50,
       "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hFracPiQeP",
+      "type": "TH1D",
+      "axes": "Fraction QE #pi Momentum; P [MeV];Fraction",
+      "bins": 60,
+      "u_lim": 1200.0,
       "l_lim": 0.0
     },
     {
