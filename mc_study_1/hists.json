@@ -89,6 +89,30 @@
       "l_lim": -1.0
     },
     {
+      "name" : "hPiDaughterKe",
+      "type": "TH1D",
+      "axes": "Daughter #pi Kinetic Energy; KE [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hProtonDaughterKe",
+      "type": "TH1D",
+      "axes": "Daughter Proton Kinetic Energy; KE [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "hNeutronDaughterKe",
+      "type": "TH1D",
+      "axes": "Daughter Neutron Kinetic Energy; KE [MeV];Count",
+      "bins": 50,
+      "u_lim": 1000.0,
+      "l_lim": 0.0
+    },
+    {
       "name" : "hPiQeKe",
       "type": "TH1D",
       "axes": "All QE #pi Kinetic Energy; KE [MeV];Count",

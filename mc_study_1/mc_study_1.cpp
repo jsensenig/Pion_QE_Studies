@@ -77,6 +77,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
     tree->GetEntry( i );
 
     double pi_ke = -1;
+    double pi_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPiP );
     hists.th1_hists["hPrimaryEndProc"] -> Fill( true_beam_endProcess->c_str(), 1 );
 
     // Check what is included in the definition of the "pi+inelastic"
@@ -89,7 +90,7 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
       hists.th1_hists["hDaughterN"] -> Fill( true_daughter_nNeutron );
 
       // All in-elastic pi events
-      pi_ke = utils::CalculateKE( true_beam_endP*1.e3, utils::pdg::pdg2mass(utils::pdg::kPdgPiP) );
+      pi_ke = utils::CalculateKE( true_beam_endP*1.e3, pi_mass );
       hists.th1_hists["hPiInElKe"] -> Fill( pi_ke );
       hists.th1_hists["hPiInElP"] -> Fill( true_beam_endP*1.e3 );
 
@@ -114,6 +115,8 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
     // Loop over true beam daughters
     for( size_t i = 0; i < true_beam_daughter_startPx->size(); i++ ) {
 
+      double daughter_ke = utils::CalculateKE( true_beam_daughter_startP->at(i)*1.e3,
+                           utils::pdg::pdg2mass( true_beam_daughter_PDG->at(i) ) );
       double angle = scatter_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
                                     true_beam_daughter_startPx->at( i ),
                                     true_beam_daughter_startPy->at( i ),
@@ -123,12 +126,15 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
         // Scattering angle of the daughter pion
         hists.th1_hists["hPiAngle"]->Fill( angle );
         hists.th1_hists["hPiCosAngle"]->Fill( TMath::Cos( angle ));
+        hists.th1_hists["hPiDaughterKe"] -> Fill( daughter_ke );
       } else if( true_beam_daughter_PDG->at(i) == utils::pdg::kPdgProton ) {
         // Scattering angle of the daughter proton
         hists.th1_hists["hProtonAngle"] -> Fill( angle );
+        hists.th1_hists["hProtonDaughterKe"] -> Fill( daughter_ke );
       } else if( true_beam_daughter_PDG->at(i) == utils::pdg::kPdgNeutron ) {
         // Scattering angle of the daughter proton
         hists.th1_hists["hNeutronAngle"] -> Fill( angle );
+        hists.th1_hists["hNeutronDaughterKe"] -> Fill( daughter_ke );
       }
     }
 
@@ -139,8 +145,8 @@ void run_mc_study( std::string in_file, Histograms &hists ) {
 
     // --> Calculate the energy loss, omega
     // Initial and final pion energy
-    double pi_intial_e = utils::CalculateE( true_beam_endP*1.e3, utils::pdg::pdg2mass(utils::pdg::kPdgPiP) );
-    double pi_final_e = utils::CalculateE( true_beam_daughter_startP->at(pi_idx)*1.e3, utils::pdg::pdg2mass(utils::pdg::kPdgPiP) );
+    double pi_intial_e = utils::CalculateE( true_beam_endP*1.e3, pi_mass );
+    double pi_final_e = utils::CalculateE( true_beam_daughter_startP->at(pi_idx)*1.e3, pi_mass );
     // Initial and final pion 4-vectors
     TLorentzVector k_in( true_beam_endPx*1.e3, true_beam_endPy*1.e3, true_beam_endPz*1.e3, pi_intial_e );
     TLorentzVector k_out( true_beam_daughter_startPx->at(pi_idx)*1.e3 , true_beam_daughter_startPy->at(pi_idx)*1.e3,
