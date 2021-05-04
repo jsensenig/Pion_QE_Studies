@@ -71,7 +71,9 @@ namespace utils {
         case kPdgAntiMuon :
           return 105.658;
         case kPdgPiP      :
-          return 139.57;
+          return 139.570;
+        case kPdgPi0      :
+          return 134.977;
         case kPdgKP       :
           return 493.677;
         case kPdgProton   :

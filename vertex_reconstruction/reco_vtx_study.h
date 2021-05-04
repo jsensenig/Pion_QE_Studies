@@ -7,7 +7,7 @@
 
 #include "../utilities/Histograms.hpp"
 
-void run_reco_vertex( std::string in_file );
+void run_reco_vertex( std::string in_file, Histograms &hists );
 
 
 #endif //PION_QE_RECO_VTX_STUDY_H
