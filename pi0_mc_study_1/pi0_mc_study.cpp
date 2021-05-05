@@ -86,6 +86,20 @@ void run_pi0_mc_study( std::string in_file, Histograms &hists ) {
       hists.th1_hists["hPiInElKe"]->Fill( pi_ke );
     }
 
+    bool true_abs = true_beam_endProcess->compare("pi+Inelastic") == 0 &&
+                    true_daughter_nPi0 == 0 && true_daughter_nPiMinus == 0 &&
+                    true_daughter_nPiPlus == 0;
+    if( true_abs ) {
+      int ngamma = 0;
+      for( size_t i = 0; i < true_beam_daughter_PDG->size(); i++ ) {
+        if( true_beam_daughter_PDG->at(i) == utils::pdg::kPdgGamma ) {
+          hists.th1_hists["hAbsGammaP"] -> Fill( true_beam_daughter_startP->at(i)*1.e3 );
+          ngamma++;
+        }
+      }
+      hists.th1_hists["hAbsNgamma"] -> Fill( ngamma );
+    }
+
     // Define true CEX
     bool true_cex = true_beam_endProcess->compare("pi+Inelastic") == 0 &&
                    true_daughter_nPi0 > 0 && true_daughter_nPiMinus == 0 &&
