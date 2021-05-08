@@ -191,13 +191,13 @@ namespace utils {
   }
 
   // Template function to count the occurrence of a specified TTree array elements
-  //----------------------------------------------------------------
-//  template<typename T>
-//  int Count( TTreeReaderArray<T> & arr, T a ) {
-//
-//    return std::count( arr.begin(), arr.end(), a );
-//
-//  }
+  // ----------------------------------------------------------------
+  template<typename T>
+  int Count( std::vector<T> & vec, T a ) {
+
+    return std::count( vec.begin(), vec.end(), a );
+
+  }
 
   // Template function to find an element in a TTree array
   //----------------------------------------------------------------
