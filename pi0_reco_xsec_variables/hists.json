@@ -71,6 +71,30 @@
       "bins": 80,
       "u_lim": 1.0,
       "l_lim": -1.0
+    },
+    {
+      "name" : "hShowerEnergyDiff",
+      "type": "TH1D",
+      "axes": "Difference True-Reco Gamma Energy;True-Reco E_#gamma [MeV];Count",
+      "bins": 60,
+      "u_lim": 500.0,
+      "l_lim": -100.0
+    },
+    {
+      "name" : "hShowerAngleTrueBeamDiff",
+      "type": "TH1D",
+      "axes": "Difference True-Reco Gamma Angle (True Beam Dir);True-Reco #theta_#gamma [deg];Count",
+      "bins": 40,
+      "u_lim": 90.0,
+      "l_lim": -90.0
+    },
+    {
+      "name" : "hShowerAngleRecoBeamDiff",
+      "type": "TH1D",
+      "axes": "Difference True-Reco Gamma Angle (Reco Beam Dir);True-Reco #theta_#gamma [deg];Count",
+      "bins": 40,
+      "u_lim": 90.0,
+      "l_lim": -90.0
     }
   ],
   "2d_hists": [
@@ -183,6 +207,83 @@
       "xl_lim": 0,
       "yu_lim": 5,
       "yl_lim": 0
+    },
+    {
+      "name" : "hShowerGammaEnergy",
+      "type": "TH2D",
+      "axes": "True Gamma vs Reco Shower Energy;Reco Shower E [MeV];True E_#gamma [MeV]",
+      "xbins": 60,
+      "ybins": 60,
+      "xu_lim": 600.0,
+      "xl_lim": 0.0,
+      "yu_lim": 600.0,
+      "yl_lim": 0.0
+    },
+    {
+      "name" : "hShowerEnergyDifffEnergy",
+      "type": "TH2D",
+      "axes": "True - Reco Shower Energy vs True Energy;True E [MeV];True-Reco E [MeV]",
+      "xbins": 80,
+      "ybins": 60,
+      "xu_lim": 800.0,
+      "xl_lim": 0.0,
+      "yu_lim": 500.0,
+      "yl_lim": -100.0
+    },
+    {
+      "name" : "hShowerEnergyDifffAngle",
+      "type": "TH2D",
+      "axes": "True - Reco Shower Energy vs True Angle;True Angle [deg];True-Reco E [MeV]",
+      "xbins": 40,
+      "ybins": 60,
+      "xu_lim": 180.0,
+      "xl_lim": 0.0,
+      "yu_lim": 500.0,
+      "yl_lim": -100.0
+    },
+    {
+      "name" : "hShowerAngleDifffEnergy",
+      "type": "TH2D",
+      "axes": "True - Reco Angle vs True Energy;True E [MeV];True-Reco #theta [deg]",
+      "xbins": 80,
+      "ybins": 40,
+      "xu_lim": 800.0,
+      "xl_lim": 0.0,
+      "yu_lim": 90.0,
+      "yl_lim": -90.0
+    },
+    {
+      "name" : "hShowerAngleDifffAngle",
+      "type": "TH2D",
+      "axes": "True - Reco Shower Angle vs True Angle;True Angle [rad];True-Reco #theta [deg]",
+      "xbins": 40,
+      "ybins": 40,
+      "xu_lim": 180.0,
+      "xl_lim": 0.0,
+      "yu_lim": 90.0,
+      "yl_lim": -90.0
+    },
+    {
+      "name" : "hpi0TrueRecoEnergy",
+      "type": "TH2D",
+      "axes": "True vs Reco Energy;Reco Energy [MeV];True Energy [MeV]",
+      "xbins": 60,
+      "ybins": 60,
+      "xu_lim": 1200.0,
+      "xl_lim": 0.0,
+      "yu_lim": 1200.0,
+      "yl_lim": 0.0
+    },
+    {
+      "name" : "hpi0TrueRecoTheta",
+      "type": "TH2D",
+      "axes": "True vs Reco Angle;Reco #theta [deg];True #theta [deg]",
+      "xbins": 60,
+      "ybins": 60,
+      "xu_lim": 90.0,
+      "xl_lim": -90.0,
+      "yu_lim": 90.0,
+      "yl_lim": -90.0
     }
   ]
 }

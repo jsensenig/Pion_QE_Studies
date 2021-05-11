@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(pi0_reco_xsec_variables)
 
 set( CMAKE_CXX_STANDARD 17 )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 find_package( ROOT 6.22 CONFIG REQUIRED )
 
@@ -18,7 +19,7 @@ add_executable( pi0_reco_xsec_study
         ../utilities/Histograms.cpp
         ../utilities/Histograms.hpp)
 
-      add_library( libVecs SHARED IMPORTED )
+add_library( libVecs SHARED IMPORTED )
 set_target_properties( libVecs PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/build/datatypes/libVecs.dylib )
 
 target_link_libraries(pi0_reco_xsec_study

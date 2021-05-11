@@ -9,7 +9,8 @@ ROOT_GENERATE_DICTIONARY(VecsDict
         LINKDEF LinkDef.h
         MODULE Vecs)
 
-#Create the Vecs library with the ROOT dictionary.
+# Create the Vecs library with the ROOT dictionary.
+# Must be a shared library since ROOT will load it dynamically at runtime
 add_library(Vecs SHARED
             VecsDict.cxx)
 

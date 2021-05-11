@@ -19,8 +19,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
     return;
   }
 
-  //TTree* tree = (TTree*)proc_file -> Get("pionana/beamana");
-  TTree* tree = (TTree*)proc_file -> Get("pduneana/beamana");
+  TTree* tree = (TTree*)proc_file -> Get("pionana/beamana");
 
   int true_daughter_nPi0;
   int true_daughter_nNeutron;
@@ -70,6 +69,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
   std::vector<double> *reco_daughter_PFP_true_byHits_startPx = new std::vector<double>;
   std::vector<double> *reco_daughter_PFP_true_byHits_startPy = new std::vector<double>;
   std::vector<double> *reco_daughter_PFP_true_byHits_startPz = new std::vector<double>;
+  std::vector<std::string> *reco_daughter_PFP_true_byHits_endProcess = new std::vector<std::string>;
 
   std::vector<std::vector<int>> *true_beam_Pi0_decay_reco_byHits_allShower_ID = new std::vector<std::vector<int>>;
 
@@ -128,6 +128,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
   tree->SetBranchAddress("reco_daughter_PFP_true_byHits_endX", &reco_daughter_PFP_true_byHits_endX);
   tree->SetBranchAddress("reco_daughter_PFP_true_byHits_endY", &reco_daughter_PFP_true_byHits_endY);
   tree->SetBranchAddress("reco_daughter_PFP_true_byHits_endZ", &reco_daughter_PFP_true_byHits_endZ);
+  tree->SetBranchAddress("reco_daughter_PFP_true_byHits_endProcess", &reco_daughter_PFP_true_byHits_endProcess);
 
   tree->SetBranchAddress("true_beam_Pi0_decay_reco_byHits_allShower_ID", &true_beam_Pi0_decay_reco_byHits_allShower_ID);
 
@@ -142,7 +143,6 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
     tree->GetEntry( i );
 
     double pi0_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPi0 );
-    double pi_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPiP );
     int pi0_idx = utils::FindIndex<int>( *true_beam_daughter_PDG, utils::pdg::kPdgPi0 );
 
     // Define true CEX
@@ -151,24 +151,6 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
                    true_daughter_nPiPlus == 0;
 
     if( !true_cex ) continue;
-
-    std::cout << "--------------- " << true_daughter_nPi0 << " - " << true_beam_daughter_reco_byHits_allShower_ID->size()
-              << " - " << true_beam_Pi0_decay_reco_byHits_allShower_ID->size() << std::endl;
-
-    for(auto &true_id : *true_beam_Pi0_decay_reco_byHits_allShower_ID) {
-      std::cout << " [" << true_id.size() << "] ";
-      for(auto &id : true_id) std::cout << id << "  ";
-    }
-    std::cout << std::endl;
-    for(auto &shower_id : *reco_daughter_allShower_ID) std::cout << shower_id << "  ";
-    std::cout << std::endl;
-    for(auto &true_pi0_pdg : *true_beam_Pi0_decay_PDG) std::cout << true_pi0_pdg << "  ";
-    std::cout << std::endl;
-
-    for(size_t j = 0; j < reco_daughter_PFP_true_byHits_PDG->size(); j++) {
-      std::cout << reco_daughter_PFP_true_byHits_PDG->at( j ) << "/" <<reco_daughter_PFP_true_byHits_ID->at(j) << "  ";
-    }
-    std::cout << std::endl;
 
         // Loop over pi0 decay gammas
     for( size_t i = 0; i < true_beam_Pi0_decay_parID->size()/2; i++ ) {
@@ -180,7 +162,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
       // Decay gammas momentum and opening angle
       double gamma1 = true_beam_Pi0_decay_startP -> at( idx ) * 1.e3;
       double gamma2 = true_beam_Pi0_decay_startP -> at( idx+1 ) * 1.e3;
-      double angle = open_angle( true_beam_Pi0_decay_startPx->at(idx), true_beam_Pi0_decay_startPy->at(idx),
+      double open_angle_gg = open_angle( true_beam_Pi0_decay_startPx->at(idx), true_beam_Pi0_decay_startPy->at(idx),
                                  true_beam_Pi0_decay_startPz->at(idx), true_beam_Pi0_decay_startPx->at(idx+1),
                                  true_beam_Pi0_decay_startPy->at(idx+1), true_beam_Pi0_decay_startPz->at(idx+1) );
 
@@ -188,7 +170,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
       double gamma_pos1 = utils::Distance(true_beam_Pi0_decay_startX->at(idx), true_beam_Pi0_decay_startY->at(idx), true_beam_Pi0_decay_startZ->at(idx));
       double gamma_pos2 = utils::Distance(true_beam_Pi0_decay_startX->at(idx+1), true_beam_Pi0_decay_startY->at(idx+1), true_beam_Pi0_decay_startZ->at(idx+1));
 
-      hists.th1_hists["hGammaOpenAngle"] -> Fill( angle );
+      hists.th1_hists["hGammaOpenAngle"] -> Fill( open_angle_gg );
       hists.th1_hists["hLeadGammaP"] -> Fill( std::max( gamma1, gamma2 ) );
       hists.th1_hists["hSubLeadGammaP"] -> Fill( std::min( gamma1, gamma2 ) );
       hists.th2_hists["hGammaP"] -> Fill( std::max( gamma1, gamma2 ), std::min( gamma1, gamma2 ) );
@@ -198,15 +180,15 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
       if( true_daughter_nPi0 > 1 ) continue;
 
       // Angular momentum calculation
-      double angle_deg = angle * TMath::RadToDeg();
+      double angle_deg = open_angle_gg * TMath::RadToDeg();
       // Momentum from polynomial fit Ref https://arxiv.org/pdf/1511.00941.pdf
       double p_poly = 2202.3 - 94.9*angle_deg + 2.1*pow(angle_deg, 2) - 0.025*pow(angle_deg, 3) + 0.00017*pow(angle_deg, 4)
                - 6.0e-7*pow(angle_deg, 5) + 8.5e-10*pow(angle_deg, 6);
-      double p_root = sqrt( pow(gamma1,2) + pow(gamma2,2) + 2*gamma1*gamma2*cos(angle) );
+      double p_root = sqrt( pow(gamma1,2) + pow(gamma2,2) + 2*gamma1*gamma2*cos(open_angle_gg) );
 
       // Energy true and calculated
       double pi0_true_energy = utils::CalculateE( true_beam_daughter_startP->at( pi0_idx ) * 1.e3, pi0_mass );
-      double pi0_calc_energy = sqrt( pow(pi0_mass, 2) + pow(p_root, 2) );
+      double pi0_calc_energy = E_gamma_gammma( gamma1, gamma2, open_angle_gg );
 
       hists.th1_hists["hPolyPi0PError"] -> Fill( p_poly / (true_beam_daughter_startP->at( pi0_idx )*1.e3) );
       hists.th1_hists["hRootPi0PError"] -> Fill( p_root / (true_beam_daughter_startP->at( pi0_idx )*1.e3) );
@@ -237,7 +219,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
       hists.th2_hists["hGammaPi0Angle"] -> Fill( gamma1_open_angle*TMath::RadToDeg(), gamma2_open_angle*TMath::RadToDeg() );
 
       // angles wrt incoming pi+
-      double cos_pi0_angle_calc = ( gamma1 * cos(gamma1_angle) + gamma2 * cos(gamma2_angle) ) / p_root;
+      double cos_pi0_angle_calc = theta_gamma_gammma( gamma1, gamma2, open_angle_gg, gamma1_angle, gamma2_angle );
       double cos_pi0_angle_mc = cos( pi0_angle );
       hists.th2_hists["hPi0TrueCalc"] -> Fill( cos_pi0_angle_calc, cos_pi0_angle_mc );
       hists.th1_hists["hPi0CalcAngleDiff"] -> Fill( cos_pi0_angle_calc - cos_pi0_angle_mc );
@@ -250,11 +232,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
     std::vector<int> gamma_idx = get_reco_gamma_index( *reco_daughter_PFP_true_byHits_PDG, *reco_daughter_PFP_true_byHits_parPDG );
     hists.th2_hists["hTrueRecoGammaCount"] -> Fill( gamma_idx.size(), true_daughter_nPi0 );
 
-    // Is the number of gamma true-byHits == # showers?
-    std::cout << "n-true-byHits " << gamma_idx.size() << " n-showers " << reco_daughter_allShower_energy->size() << std::endl;
-
     for( auto &reco_idx : gamma_idx ) {
-      //int true_idx = utils::FindIndex( *true_beam_Pi0_decay_ID, reco_idx );
       TVector3 gamma( reco_daughter_PFP_true_byHits_endX->at(reco_idx), reco_daughter_PFP_true_byHits_endY->at(reco_idx),
                       reco_daughter_PFP_true_byHits_endZ->at(reco_idx));
       TVector3 gammaP( reco_daughter_PFP_true_byHits_startPx->at(reco_idx), reco_daughter_PFP_true_byHits_startPy->at(reco_idx),
@@ -264,9 +242,80 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
                          reco_daughter_allShower_startZ->at(i));
         TVector3 showerDir( reco_daughter_allShower_dirX->at(i),reco_daughter_allShower_dirY->at(i),
                             reco_daughter_allShower_dirZ->at(i));
-        std::cout << "[shower . gamma] " << showerDir.Angle( gammaP ) << "  ";
       }
-      std::cout << std::endl;
+    }
+
+    // Get the beam direction, to be used below
+    TVector3 true_beam_dir( true_beam_endPx, true_beam_endPy, true_beam_endPz );
+    TVector3 reco_beam_dir( reco_beam_trackEndDirX, reco_beam_trackEndDirY, reco_beam_trackEndDirZ );
+
+    // Get the indices of the pi0 decay gammas
+    std::vector<int> true_gamma_idx = get_true_reco_gamma_index( *reco_daughter_PFP_true_byHits_PDG, *reco_daughter_PFP_true_byHits_ID,
+                                                                 *reco_daughter_PFP_true_byHits_parPDG );
+
+    // Create map with a the 2 gammas from pi0 -> gg
+    std::map<int, std::vector<int>> gamma_pair_map; // map = <index, {leading idx, sub-leading idx}>
+    for( int idx : true_gamma_idx ) {
+      int id = reco_daughter_PFP_true_byHits_ID -> at(idx);
+      gamma_pair_map[ id ].push_back( idx );
+    }
+
+    for( auto & gpair : gamma_pair_map ) {
+      int idx1 = gpair.second.at(0); int idx2 = gpair.second.at(1);
+      // If either shower energy is invalid skip
+      if( reco_daughter_allShower_energy->at(idx1) == -999 || reco_daughter_allShower_energy->at(idx2) == -999 ) continue;
+      TVector3 shower_reco_dir1( reco_daughter_allShower_dirX->at(idx1), reco_daughter_allShower_dirY->at(idx1),
+                                reco_daughter_allShower_dirZ->at(idx1) );
+      TVector3 shower_reco_dir2( reco_daughter_allShower_dirX->at(idx2), reco_daughter_allShower_dirY->at(idx2),
+                                 reco_daughter_allShower_dirZ->at(idx2) );
+      TVector3 true_gamma_P1( reco_daughter_PFP_true_byHits_startPx->at(idx1), reco_daughter_PFP_true_byHits_startPy->at(idx1),
+                             reco_daughter_PFP_true_byHits_startPz->at(idx1));
+      TVector3 true_gamma_P2( reco_daughter_PFP_true_byHits_startPx->at(idx2), reco_daughter_PFP_true_byHits_startPy->at(idx2),
+                             reco_daughter_PFP_true_byHits_startPz->at(idx2));
+      // Reco quantities
+      double shower_energy1 = reco_daughter_allShower_energy->at(idx1);
+      double shower_energy2 = reco_daughter_allShower_energy->at(idx2);
+      double reco_theta_gg = shower_reco_dir1.Angle( shower_reco_dir2 ); // theta [rad]
+      double reco_theta1 = reco_beam_dir.Angle( shower_reco_dir1 );
+      double reco_theta2 = reco_beam_dir.Angle( shower_reco_dir2 );
+      // True quantities
+      double true_gamma_energy1 = true_gamma_P1.Mag() * 1.e3;
+      double true_gamma_energy2 = true_gamma_P2.Mag() * 1.e3;
+      double true_theta_gg = true_gamma_P1.Angle( true_gamma_P2 );
+      double true_theta1 = true_beam_dir.Angle( true_gamma_P1 );
+      double true_theta2 = true_beam_dir.Angle( true_gamma_P2 );
+
+      double reco_pi0_energy = E_gamma_gammma( shower_energy1, shower_energy2, reco_theta_gg );
+      double reco_pi0_theta = theta_gamma_gammma( shower_energy1, shower_energy2, reco_theta_gg, reco_theta1, reco_theta2 );
+      double true_pi0_energy = E_gamma_gammma( true_gamma_energy1, true_gamma_energy2, true_theta_gg );
+      double true_pi0_theta = theta_gamma_gammma( true_gamma_energy1, true_gamma_energy2, true_theta_gg, true_theta1, true_theta2 );
+      hists.th2_hists["hpi0TrueRecoEnergy"] -> Fill( reco_pi0_energy, true_pi0_energy );
+      hists.th2_hists["hpi0TrueRecoTheta"] -> Fill( reco_pi0_theta * TMath::RadToDeg(), true_pi0_theta * TMath::RadToDeg() );
+
+    }
+
+    // Loop over showers from pi0s which have both showers reconstructed
+    for( int k : true_gamma_idx ) {
+      TVector3 gamma_true_mom( reco_daughter_PFP_true_byHits_startPx->at(k)*1.e3, reco_daughter_PFP_true_byHits_startPy->at(k)*1.e3,
+                      reco_daughter_PFP_true_byHits_startPz->at(k)*1.e3 );
+      TVector3 shower_reco_dir( reco_daughter_allShower_dirX->at(k), reco_daughter_allShower_dirY->at(k),
+                                reco_daughter_allShower_dirZ->at(k) );
+      hists.th2_hists["hShowerGammaEnergy"] -> Fill( reco_daughter_allShower_energy->at(k), gamma_true_mom.Mag() );
+      // true - reco
+      double true_angle = true_beam_dir.Angle( gamma_true_mom ) * TMath::RadToDeg();
+      double energy_diff = gamma_true_mom.Mag() - reco_daughter_allShower_energy->at(k);
+      double reco_angle_tbeam = true_beam_dir.Angle( shower_reco_dir ) * TMath::RadToDeg();
+      double reco_angle_rbeam = reco_beam_dir.Angle( shower_reco_dir ) * TMath::RadToDeg();
+      double angle_diff = true_angle - reco_angle_tbeam;
+      hists.th1_hists["hShowerEnergyDiff"] -> Fill( energy_diff );
+      hists.th1_hists["hShowerAngleTrueBeamDiff"] -> Fill( true_angle - reco_angle_tbeam );
+      hists.th1_hists["hShowerAngleRecoBeamDiff"] -> Fill( true_angle - reco_angle_rbeam );
+      // 2D energy difference
+      hists.th2_hists["hShowerEnergyDifffEnergy"] -> Fill( gamma_true_mom.Mag(), energy_diff );
+      hists.th2_hists["hShowerEnergyDifffAngle"] -> Fill( true_angle, energy_diff );
+      // 2D angle difference
+      hists.th2_hists["hShowerAngleDifffEnergy"] -> Fill( gamma_true_mom.Mag(), angle_diff );
+      hists.th2_hists["hShowerAngleDifffAngle"] -> Fill( true_angle, angle_diff );
     }
 
   }
@@ -299,6 +348,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
   delete reco_daughter_PFP_true_byHits_startPx;
   delete reco_daughter_PFP_true_byHits_startPy;
   delete reco_daughter_PFP_true_byHits_startPz;
+  delete reco_daughter_PFP_true_byHits_endProcess;
   delete true_beam_Pi0_decay_PDG;
   delete true_beam_Pi0_decay_startP;
   delete true_beam_Pi0_decay_parID;
@@ -333,11 +383,40 @@ std::vector<int> get_reco_gamma_index( std::vector<int> &true_pdg, std::vector<i
   return daughter_idx;
 }
 
+// Return vector of indices corresponding to the reco showers for both reco and true_byHits vectors
+std::vector<int> get_true_reco_gamma_index( std::vector<int> &true_pdg, std::vector<int> &true_id,
+                                            std::vector<int> &true_parent_pdg ) {
+  // True-byHits so some showers adn therefore gamma are missed
+  // 1. Must be a gamma with parent pi0
+  // 2. Must have 2 same IDs which indicates the gammas are from the same parent (pi0)
+  // 3. If meets above save index
+  std::vector<int> daughter_idx;
+  for ( size_t j = 0; j < true_pdg.size(); j++ ) {
+    if ( true_pdg.at( j ) == utils::pdg::kPdgGamma && true_parent_pdg.at( j ) == utils::pdg::kPdgPi0 ) {
+      int id_cnt = utils::Count<int>( true_id, true_id.at(j) );
+      if( id_cnt == 2 ) daughter_idx.push_back( j );
+    }
+  }
+  return daughter_idx;
+}
+
+// Calculate the energy of the parent pi0 given the decay gamma's energy and opening angle
+// Momentum calculation `p_gg` from Ref https://arxiv.org/pdf/1511.00941.pdf Eq.(3)
+double E_gamma_gammma( double E_g1, double E_g2, double theta_gg ) {
+  double p_gg = sqrt( pow(E_g1, 2) + pow(E_g2, 2) + 2 * E_g1 * E_g1 * cos(theta_gg) );
+  return sqrt( pow( p_gg, 2 ) + pow( utils::pdg::pdg2mass( utils::pdg::kPdgPi0), 2) );
+}
+
+// Calculate the angle of the parent pi0 given the decay gamma's energy, angles wrt beam and opening angle
+// Angle calculation `theta_gg` from Ref https://arxiv.org/pdf/1511.00941.pdf Eq.(4)
+double theta_gamma_gammma( double E_g1, double E_g2, double theta_gg, double theta_g1, double theta_g2 ) {
+  double p_gg = sqrt( pow(E_g1, 2) + pow(E_g2, 2) + 2 * E_g1 * E_g1 * cos(theta_gg) );
+  return ( E_g1 * cos(theta_g1) + E_g2 * cos(theta_g2) ) / p_gg;
+}
+
 int main() {
 
-//  std::string input_file = "../../../pionana_Prod4_mc_1GeV_1_14_21.root";
-//  std::string input_file = "../../../pduneana_Prod4_mc_1GeV_03_14_21_f1.root";
-  std::string input_file = "../../../pduneana_n50_true_reco.root";
+  std::string input_file = "../../../pionana_Prod4_mc_1GeV_1_14_21.root";
   TString output_file = "out.root";
   std::string hists_config = "../hists.json";
 
