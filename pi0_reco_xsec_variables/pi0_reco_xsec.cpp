@@ -375,8 +375,7 @@ double open_angle( double px1, double py1, double pz1, double px2, double py2, d
 std::vector<int> get_reco_gamma_index( std::vector<int> &true_pdg, std::vector<int> &true_parent_pdg ) {
   std::vector<int> daughter_idx;
   for( size_t j = 0; j < true_pdg.size(); j++ ) {
-    if( true_pdg.at(j) == utils::pdg::kPdgGamma ||
-        true_parent_pdg.at(j) == utils::pdg::kPdgPi0 ) {
+    if( true_pdg.at(j) == utils::pdg::kPdgGamma || true_parent_pdg.at(j) == utils::pdg::kPdgPi0 ) {
       daughter_idx.push_back( j );
     }
   }
