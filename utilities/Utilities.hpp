@@ -223,13 +223,15 @@ namespace utils {
 
   }
 
-  // Template function to find and return an element index in a TTree array
-  //----------------------------------------------------------------
-//  static double Distance( Vector_t & v1, Vector_t & v2 ) {
-//
-//    return ( v1 - v2 ).R();
-//
-//  }
+// Template function to find and return an element index in a TTree array
+//----------------------------------------------------------------
+  static double dR( double xbeam, double ybeam, double zbeam, double xdaughter, double ydaughter, double zdaughter ) {
+
+    return sqrt( (xbeam - xdaughter)*(xbeam - xdaughter) + 
+                 (ybeam - ydaughter)*(ybeam - ydaughter) +
+                 (zbeam - zdaughter)*(zbeam - zdaughter)
+               );
+  }
 
   static double Distance( double x, double y, double z ) {
 

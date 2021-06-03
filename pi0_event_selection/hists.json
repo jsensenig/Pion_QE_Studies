@@ -9,22 +9,6 @@
       "l_lim": 0.0
     },
     {
-      "name" : "hTrueByHitsBeamPdg",
-      "type": "TH1I",
-      "axes": "Beam PDG (True-by-hits);PDG;Count",
-      "bins": 10,
-      "u_lim": 10,
-      "l_lim": 0
-    },
-    {
-      "name" : "hTrueBeamPdg",
-      "type": "TH1I",
-      "axes": "True Beam PDG;PDG;Count",
-      "bins": 10,
-      "u_lim": 10,
-      "l_lim": 0
-    },
-    {
       "name" : "hPi0E",
       "type": "TH1D",
       "axes": "Daughter #pi0 Energy;E [MeV];Count",
@@ -111,6 +95,86 @@
       "bins": 40,
       "u_lim": 90.0,
       "l_lim": -90.0
+    },
+    {
+      "name" : "beam_avg_pida_p",
+      "type": "TH1D",
+      "axes": "Beam Proton <PIDA>; p <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "beam_avg_pida_pi",
+      "type": "TH1D",
+      "axes": "Beam Pion <PIDA>; #pi <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "beam_avg_pida_mu",
+      "type": "TH1D",
+      "axes": "Beam Muon <PIDA>; #mu <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "beam_avg_pida_e",
+      "type": "TH1D",
+      "axes": "Beam Electron <PIDA>; e <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "beam_avg_pida_other",
+      "type": "TH1D",
+      "axes": "Beam Other <PIDA>; Other <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "daughter_avg_pida_p",
+      "type": "TH1D",
+      "axes": "Daughter Proton <PIDA>; p <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "daughter_avg_pida_pi",
+      "type": "TH1D",
+      "axes": "Daughter Pion <PIDA>; #pi <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "daughter_avg_pida_mu",
+      "type": "TH1D",
+      "axes": "Daughter Muon <PIDA>; #mu <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "daughter_avg_pida_e",
+      "type": "TH1D",
+      "axes": "Daughter Electron <PIDA>; e <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
+    },
+    {
+      "name" : "daughter_avg_pida_other",
+      "type": "TH1D",
+      "axes": "Daughter Other <PIDA>; Other <PIDA>;Count",
+      "bins": 40,
+      "u_lim": 20.0,
+      "l_lim": 0.0
     }
   ],
   "2d_hists": [
@@ -300,6 +364,39 @@
       "xl_lim": -90.0,
       "yu_lim": 90.0,
       "yl_lim": -90.0
+    },
+    {
+      "name" : "fit_daughter_pid",
+      "type": "TH2I",
+      "axes": "Daughter Reco vs True PDG;True PDG;Reco PDG",
+      "xbins": 8,
+      "ybins": 2,
+      "xu_lim": 8,
+      "xl_lim": 0,
+      "yu_lim": 2,
+      "yl_lim": 0
+    },
+    {
+      "name" : "chi2_daughter_pid",
+      "type": "TH2I",
+      "axes": "Daughter Reco vs True PDG;True PDG;Reco PDG",
+      "xbins": 8,
+      "ybins": 2,
+      "xu_lim": 8,
+      "xl_lim": 0,
+      "yu_lim": 2,
+      "yl_lim": 0
+    },
+    {
+      "name" : "true_beam_pdg_michel_score",
+      "type": "TH2D",
+      "axes": "True-byHits Beam PDG vs Michel Score;Michel Score;True Beam PDG",
+      "xbins": 50,
+      "ybins": 10,
+      "xu_lim": 1,
+      "xl_lim": 0,
+      "yu_lim": 10,
+      "yl_lim": 0
     }
   ]
 }

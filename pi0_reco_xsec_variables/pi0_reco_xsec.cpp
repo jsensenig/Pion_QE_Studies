@@ -30,6 +30,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
   double true_beam_endP;
   double true_beam_endX, true_beam_endY, true_beam_endZ;
   double true_beam_endPx, true_beam_endPy, true_beam_endPz;
+  int reco_beam_true_byHits_PDG;
 
   std::vector<int> *true_beam_daughter_PDG = new std::vector<int>;
   std::vector<int> *true_beam_daughter_ID = new std::vector<int>;
@@ -109,6 +110,7 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
   tree->SetBranchAddress("true_beam_Pi0_decay_len", &true_beam_Pi0_decay_len);
 
   // Reco
+  tree->SetBranchAddress("reco_beam_true_byHits_PDG", &reco_beam_true_byHits_PDG);
   tree->SetBranchAddress("reco_daughter_allShower_dirX", &reco_daughter_allShower_dirX);
   tree->SetBranchAddress("reco_daughter_allShower_dirY", &reco_daughter_allShower_dirY);
   tree->SetBranchAddress("reco_daughter_allShower_dirZ", &reco_daughter_allShower_dirZ);
@@ -144,6 +146,9 @@ void run_pi0_reco_xsec( std::string in_file, Histograms &hists ) {
 
     double pi0_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPi0 );
     int pi0_idx = utils::FindIndex<int>( *true_beam_daughter_PDG, utils::pdg::kPdgPi0 );
+
+    hists.th1_hists["hTrueByHitsBeamPdg"] -> Fill( utils::pdg::pdg2string( reco_beam_true_byHits_PDG ).c_str(), 1 );
+    hists.th1_hists["hTrueBeamPdg"] -> Fill( utils::pdg::pdg2string( true_beam_PDG ).c_str(), 1 );
 
     // Define true CEX
     bool true_cex = true_beam_endProcess->compare("pi+Inelastic") == 0 &&
