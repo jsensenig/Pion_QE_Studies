@@ -6,7 +6,9 @@
 #include "../utilities/Utilities.hpp"
 #include "TTree.h"
 #include "TVector3.h"
+#include "TGraph.h"
 #include <iostream>
+#include <sstream>
 
 
 void run_pi0_mc_xsec( std::string in_file, Histograms &hists ) {
@@ -18,36 +20,8 @@ void run_pi0_mc_xsec( std::string in_file, Histograms &hists ) {
     return;
   }
 
-  TTree* tree = (TTree*)proc_file -> Get("pionana/beamana");
-
-  int true_daughter_nPi0;
-  int true_daughter_nNeutron;
-  int true_daughter_nProton;
-  int true_daughter_nPiMinus;
-  int true_daughter_nPiPlus;
-  int true_beam_PDG;
-  double true_beam_endP;
-  double true_beam_endX, true_beam_endY, true_beam_endZ;
-  double true_beam_endPx, true_beam_endPy, true_beam_endPz;
-
-  std::vector<int> *true_beam_daughter_PDG = new std::vector<int>;
-  std::vector<int> *true_beam_daughter_ID = new std::vector<int>;
-  std::vector<double> *true_beam_daughter_startP = new std::vector<double>;
-  std::vector<double> *true_beam_daughter_startPx = new std::vector<double>;
-  std::vector<double> *true_beam_daughter_startPy = new std::vector<double>;
-  std::vector<double> *true_beam_daughter_startPz = new std::vector<double>;
-  std::vector<int> *true_beam_Pi0_decay_PDG = new std::vector<int>;
-  std::vector<int> *true_beam_Pi0_decay_parID = new std::vector<int>;
-  std::vector<double> *true_beam_Pi0_decay_startP = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_startPx = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_startPy = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_startPz = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_startX = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_startY = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_startZ = new std::vector<double>;
-  std::vector<double> *true_beam_Pi0_decay_len = new std::vector<double>;
-
-  std::string *true_beam_endProcess = new std::string;
+  //TTree* tree = (TTree*)proc_file -> Get("pionana/beamana");  // 1GeV
+  TTree* tree = (TTree*)proc_file -> Get("pduneana/beamana;2"); // 2GeV
 
   tree->SetBranchAddress("true_daughter_nPi0", &true_daughter_nPi0);
   tree->SetBranchAddress("true_daughter_nNeutron", &true_daughter_nNeutron);
@@ -84,109 +58,267 @@ void run_pi0_mc_xsec( std::string in_file, Histograms &hists ) {
   size_t nevts = tree -> GetEntries();
   std::cout << "Processing " << nevts << " events." << std::endl;
 
-  for ( size_t i = 0; i < nevts; i++ ) {
-    tree->GetEntry( i );
+  pi0_proxy pi0;
 
-    double pi0_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPi0 );
-    double pi_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPiP );
-    int pi0_idx = utils::FindIndex<int>( *true_beam_daughter_PDG, utils::pdg::kPdgPi0 );
+  for ( size_t evt = 0; evt < nevts; evt++ ) {
+    tree->GetEntry( evt );
+
+    //if( evt > 10000 ) break;
 
     // Define true CEX
-    bool true_cex = true_beam_endProcess->compare("pi+Inelastic") == 0 &&
+    bool true_cex = *true_beam_endProcess == "pi+Inelastic" &&
                    true_daughter_nPi0 > 0 && true_daughter_nPiMinus == 0 &&
-                   true_daughter_nPiPlus == 0;
+                   true_daughter_nPiPlus == 0 && ( true_daughter_nProton > 0 || true_daughter_nNeutron > 0 );
 
     if( !true_cex ) continue;
 
-    std::map<int,double> pi0_energy_map;
-    for( size_t i = 0; i < true_beam_daughter_PDG->size(); i++ ) {
-
-      // Only look at pi0
-      if( true_beam_daughter_PDG->at(i) != utils::pdg::kPdgPi0 ) continue;
-      // Plot the daughter pi0
-      double daughter_pi0_energy = utils::CalculateE( true_beam_daughter_startP->at( i ) * 1.e3, pi0_mass );
-      hists.th2_hists["hPiPPi0P"] -> Fill( true_beam_endP*1.e3, true_beam_daughter_startP->at( i )*1.e3 );
-      if( true_daughter_nPi0 == 1 ) {
-        hists.th2_hists["hPiP1Pi0P"] -> Fill( true_beam_endP*1.e3, true_beam_daughter_startP->at( i )*1.e3 );
-      }
-      hists.th1_hists["hPi0E"]->Fill( daughter_pi0_energy );
-      pi0_energy_map[true_beam_daughter_ID->at(i)] = daughter_pi0_energy;
-    }
+    std::map<int, double> pi0_energy_map = daughter_pi0_energy( hists );
 
     for( size_t i = 0; i < true_beam_Pi0_decay_parID->size()/2; i++ ) {
-      size_t idx = i * 2; // Gamma from the same pi0 are adjacent in index, i.e., i and i+1
+      size_t idx = i * 2;
+      pi0.reset();
+
+      // Decay gammas from the same pi0 are adjacent in index, i.e., index and index+1
+      // They should also share the same parent ID (obviously)
       if( true_beam_Pi0_decay_parID -> at( idx ) != true_beam_Pi0_decay_parID -> at( idx+1 ) ) {
         std::cout << "Something's wrong, decay gamma IDs do not match!" << std::endl;
         std::cout << "PDG 1/2 " << true_beam_Pi0_decay_PDG->at(idx) << "/" << true_beam_Pi0_decay_PDG->at(idx+1) << std::endl;
       }
+
+      /// These are the 5 variables needed for the cross section calculation ///
+      // .........................................................................
+
       // Decay gammas momentum and opening angle
-      double gamma1 = true_beam_Pi0_decay_startP -> at( idx ) * 1.e3;
-      double gamma2 = true_beam_Pi0_decay_startP -> at( idx+1 ) * 1.e3;
-      double angle = open_angle( true_beam_Pi0_decay_startPx->at(idx), true_beam_Pi0_decay_startPy->at(idx),
+      pi0.energy.first  = true_beam_Pi0_decay_startP -> at( idx ) * 1.e3;
+      pi0.energy.second = true_beam_Pi0_decay_startP -> at( idx+1 ) * 1.e3;
+      pi0.open_angle = open_angle( true_beam_Pi0_decay_startPx->at(idx), true_beam_Pi0_decay_startPy->at(idx),
                                  true_beam_Pi0_decay_startPz->at(idx), true_beam_Pi0_decay_startPx->at(idx+1),
                                  true_beam_Pi0_decay_startPy->at(idx+1), true_beam_Pi0_decay_startPz->at(idx+1) );
 
-      double beam_end_pos = utils::Distance(true_beam_endX, true_beam_endY, true_beam_endZ);
-      double gamma_pos1 = utils::Distance(true_beam_Pi0_decay_startX->at(idx), true_beam_Pi0_decay_startY->at(idx), true_beam_Pi0_decay_startZ->at(idx));
-      double gamma_pos2 = utils::Distance(true_beam_Pi0_decay_startX->at(idx+1), true_beam_Pi0_decay_startY->at(idx+1), true_beam_Pi0_decay_startZ->at(idx+1));
-
-      hists.th1_hists["hGammaOpenAngle"] -> Fill( angle );
-      hists.th2_hists["hPi0EGammaOpenAngle"] -> Fill( TMath::RadToDeg()*angle, pi0_energy_map.at(true_beam_Pi0_decay_parID->at( idx )) );
-      hists.th1_hists["hLeadGammaP"] -> Fill( std::max( gamma1, gamma2 ) );
-      hists.th1_hists["hSubLeadGammaP"] -> Fill( std::min( gamma1, gamma2 ) );
-      hists.th2_hists["hGammaP"] -> Fill( std::max( gamma1, gamma2 ), std::min( gamma1, gamma2 ) );
-      hists.th2_hists["hGammaR"] -> Fill( gamma_pos1-beam_end_pos, gamma_pos2-beam_end_pos );
-      hists.th2_hists["hGammaLen"] -> Fill( true_beam_Pi0_decay_len->at(idx), true_beam_Pi0_decay_len->at(idx+1) );
-
-      if( true_daughter_nPi0 > 1 ) continue;
-
-      // Angular momentum calculation
-      double angle_deg = angle * TMath::RadToDeg();
-      // Momentum from polynomial fit Ref https://arxiv.org/pdf/1511.00941.pdf
-      double p_poly = 2202.3 - 94.9*angle_deg + 2.1*pow(angle_deg, 2) - 0.025*pow(angle_deg, 3) + 0.00017*pow(angle_deg, 4)
-               - 6.0e-7*pow(angle_deg, 5) + 8.5e-10*pow(angle_deg, 6);
-      double p_root = sqrt( pow(gamma1,2) + pow(gamma2,2) + 2*gamma1*gamma2*cos(angle) );
-
-      // Energy true and calculated
-      double pi0_true_energy = utils::CalculateE( true_beam_daughter_startP->at( pi0_idx ) * 1.e3, pi0_mass );
-      double pi0_calc_energy = sqrt( pow(pi0_mass, 2) + pow(p_root, 2) );
-
-      hists.th1_hists["hPolyPi0PError"] -> Fill( p_poly / (true_beam_daughter_startP->at( pi0_idx )*1.e3) );
-      hists.th1_hists["hRootPi0PError"] -> Fill( p_root / (true_beam_daughter_startP->at( pi0_idx )*1.e3) );
-      hists.th2_hists["hPi0TrueCalcEnergy"] -> Fill( pi0_calc_energy, pi0_true_energy );
-
-      // Gamma angle wrt pi0
-      double gamma1_open_angle = open_angle( true_beam_daughter_startPx->at(pi0_idx), true_beam_daughter_startPy->at(pi0_idx),
-                                        true_beam_daughter_startPz->at(pi0_idx), true_beam_Pi0_decay_startPx->at(idx),
-                                        true_beam_Pi0_decay_startPy->at(idx), true_beam_Pi0_decay_startPz->at(idx) );
-      double gamma2_open_angle = open_angle( true_beam_daughter_startPx->at(pi0_idx), true_beam_daughter_startPy->at(pi0_idx),
-                                        true_beam_daughter_startPz->at(pi0_idx), true_beam_Pi0_decay_startPx->at(idx+1),
-                                        true_beam_Pi0_decay_startPy->at(idx+1), true_beam_Pi0_decay_startPz->at(idx+1) );
-
       // Gamma angle wrt incoming pi+
-      double gamma1_angle = open_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
-                                             true_beam_Pi0_decay_startPx->at(idx), true_beam_Pi0_decay_startPy->at(idx),
-                                             true_beam_Pi0_decay_startPz->at(idx) );
-      double gamma2_angle = open_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
-                                             true_beam_Pi0_decay_startPx->at(idx+1), true_beam_Pi0_decay_startPy->at(idx+1),
-                                             true_beam_Pi0_decay_startPz->at(idx+1) );
+      pi0.angle.first = open_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
+                                    true_beam_Pi0_decay_startPx->at(idx), true_beam_Pi0_decay_startPy->at(idx),
+                                    true_beam_Pi0_decay_startPz->at(idx) );
+      pi0.angle.second = open_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
+                                     true_beam_Pi0_decay_startPx->at(idx+1), true_beam_Pi0_decay_startPy->at(idx+1),
+                                     true_beam_Pi0_decay_startPz->at(idx+1) );
 
-      // pi0 angle wrt incoming pi+
-      double pi0_angle = open_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
-                                     true_beam_daughter_startPx->at(pi0_idx), true_beam_daughter_startPy->at(pi0_idx),
-                                     true_beam_daughter_startPz->at(pi0_idx) );
+      // .........................................................................
 
-      hists.th1_hists["hGammaDiff"] -> Fill( gamma1_open_angle - gamma2_open_angle );
-      hists.th2_hists["hGammaPi0Angle"] -> Fill( gamma1_open_angle*TMath::RadToDeg(), gamma2_open_angle*TMath::RadToDeg() );
+      // Plots for events with multiple pi0
+      plot_all_pi0(pi0, pi0_energy_map.at(true_beam_Pi0_decay_parID->at( idx )), hists, idx );
 
-      // angles wrt incoming pi+
-      double cos_pi0_angle_calc = ( gamma1 * cos(gamma1_angle) + gamma2 * cos(gamma2_angle) ) / p_root;
-      double cos_pi0_angle_mc = cos( pi0_angle );
-      hists.th2_hists["hPi0TrueCalc"] -> Fill( cos_pi0_angle_calc, cos_pi0_angle_mc );
-      hists.th1_hists["hPi0CalcAngleDiff"] -> Fill( cos_pi0_angle_calc - cos_pi0_angle_mc );
+      if( true_daughter_nPi0 > 1 ) continue; // Only look at single pi0 events for now
+
+      // Plots for events with only a single pi0
+      plot_single_pi0( pi0, hists, idx );
+
+      // Bin the xsec variables
+      energy_hist -> Fill( pi0_energy( pi0 ) );
+      angle_hist  -> Fill( pi0_angle( pi0 ) * TMath::RadToDeg() );
+      energy_angle_hist -> Fill( pi0_energy(pi0), pi0_angle( pi0 ) * TMath::RadToDeg() );
+
     }
-
   }
+
+  clean_pointers();
+  proc_file -> Close();
+  delete proc_file;
+
+  extract_xsec( nevts );
+
+}
+
+// ............................................................................
+void extract_xsec( size_t nevts ) {
+
+  std::cout << "Calculating cross section" << std::endl;
+
+  // xsec calculation: https://ir.uiowa.edu/cgi/viewcontent.cgi?article=1518&context=etd (pg 54)
+
+  std::vector<std::vector<double>> xsec;
+  std::vector<double> energy, angles;
+
+  // N_tgt = 39.9624 / (6.022e23) * (1.3973) = 4.7492e-23 = Ar atomic mass / (Avagadro's number * LAr density)
+  double n_tgt = 39.9624 / ( 6.022e23 * 1.3973 );
+
+  // Get the number of bins in energy and angle
+  int energy_bins = energy_angle_hist -> GetNbinsX();
+  int angle_bins  = energy_angle_hist -> GetNbinsY();
+
+  for( size_t abins = 1; abins < angle_bins+1; abins++ ) { // angular xsec
+    // Get the angular bin center and width
+    double angle_center  = energy_angle_hist -> GetYaxis() -> GetBinCenter( abins );
+    double abin_width = energy_angle_hist ->GetYaxis() -> GetBinWidth( abins );
+    xsec.emplace_back(std::vector<double>());
+
+    for( size_t ebins = 1; ebins < energy_bins+1; ebins++ ) { // energy xsec
+      // Get the energy bin center and width
+      double energy_center = energy_angle_hist -> GetXaxis() -> GetBinCenter( ebins );
+      double ebin_width = energy_angle_hist ->GetXaxis() -> GetBinWidth( ebins );
+      double Ni = energy_angle_hist -> GetBinContent( ebins, abins );
+
+      // xsec calculation
+      double xsec_calc = ( Ni * n_tgt ) / ( nevts * ebin_width * abin_width );
+      xsec.back().emplace_back( xsec_calc / 1.e-27 ); // [milli-barn (mb)]
+      if( abins == 1 ) energy.emplace_back( energy_center);
+
+      std::cout << "Ebin width " << ebin_width << " Abin width " << abin_width << " Ni " << Ni
+                << " Energy " << energy_center << " Angle " << angle_center << " Xsec " << xsec_calc << std::endl;
+    }
+    angles.emplace_back( angle_center );
+  }
+
+  plot_xsec( xsec, angles, energy );
+
+}
+
+// ............................................................................
+void plot_xsec( std::vector<std::vector<double>> &xsec, std::vector<double> &angle, std::vector<double> &energy ) {
+
+  std::cout << "Writing Xsec to file" << std::endl;
+  auto xsec_file = std::make_unique<TFile>("xsec_out.root","recreate");
+
+  for( size_t i = 0; i < angle.size(); i++ ) {
+    auto xsec_graph = new TGraph( energy.size(), energy.data(), xsec.at(i).data() );
+    xsec_graph->SetLineColor(2); xsec_graph->SetLineWidth(1); xsec_graph->SetMarkerStyle(8); xsec_graph->SetMarkerSize(0.3);
+
+    std::stringstream title;
+    title << "Cross-section (Angle = " << angle.at(i) << " [deg])";
+    xsec_graph -> SetTitle( title.str().c_str() );
+    xsec_graph -> GetXaxis() -> SetTitle( "E_pi0 [MeV]" );
+    xsec_graph -> GetYaxis() -> SetTitle( "#sigma [mb]" );
+
+    xsec_graph -> Write();
+
+    delete xsec_graph;
+  }
+  // Write the histograms to file
+  angle_hist -> Write();
+  energy_hist -> Write();
+  energy_angle_hist -> Write();
+
+  xsec_file -> Close();
+  xsec_file -> Delete();
+
+}
+
+// ............................................................................
+double pi0_angle( pi0_proxy& pi0 ) {
+
+  return TMath::ACos( ( pi0.energy.first * cos(pi0.angle.first) + pi0.energy.second * cos(pi0.angle.second) ) / pi0_mom( pi0 ) );
+
+}
+
+// ............................................................................
+double pi0_energy( pi0_proxy& pi0 ) {
+
+  double pi0_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPi0 );
+  double pi0_p2 = pow(pi0.energy.first,2) + pow(pi0.energy.second,2) +
+                  2 * pi0.energy.first * pi0.energy.second * cos(pi0.open_angle);
+  return sqrt( pi0_mass*pi0_mass + pi0_p2 );
+
+}
+
+// ............................................................................
+double pi0_mom( pi0_proxy& pi0 ) {
+
+  return sqrt( pow(pi0.energy.first,2) + pow(pi0.energy.second,2) +
+                  2 * pi0.energy.first * pi0.energy.second * cos(pi0.open_angle) );
+
+}
+
+// ............................................................................
+void plot_single_pi0( pi0_proxy& pi0, Histograms& hists, size_t idx ) {
+
+  double pi0_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPi0 );
+  int pi0_idx = utils::FindIndex<int>( *true_beam_daughter_PDG, utils::pdg::kPdgPi0 );
+  double pi0_true_energy = utils::CalculateE( true_beam_daughter_startP->at( pi0_idx ) * 1.e3, pi0_mass );
+
+  // Momentum from polynomial fit Ref https://arxiv.org/pdf/1511.00941.pdf
+  // Convert angle to degrees first
+  double angle_deg = pi0.open_angle * TMath::RadToDeg();
+  double p_poly = 2202.3 - 94.9*angle_deg + 2.1*pow(angle_deg, 2) - 0.025*pow(angle_deg, 3) + 0.00017*pow(angle_deg, 4)
+                  - 6.0e-7*pow(angle_deg, 5) + 8.5e-10*pow(angle_deg, 6);
+
+  hists.th1_hists["hPolyPi0PError"] -> Fill( p_poly / (true_beam_daughter_startP->at( pi0_idx )*1.e3) );
+  hists.th1_hists["hRootPi0PError"] -> Fill( pi0_mom( pi0 ) / (true_beam_daughter_startP->at( pi0_idx )*1.e3) );
+  hists.th2_hists["hPi0TrueCalcEnergy"] -> Fill( pi0_energy( pi0 ), pi0_true_energy );
+
+  // Gamma angle wrt pi0
+  double gamma1_open_angle = open_angle( true_beam_daughter_startPx->at(pi0_idx), true_beam_daughter_startPy->at(pi0_idx),
+                                         true_beam_daughter_startPz->at(pi0_idx), true_beam_Pi0_decay_startPx->at(idx),
+                                         true_beam_Pi0_decay_startPy->at(idx), true_beam_Pi0_decay_startPz->at(idx) );
+  double gamma2_open_angle = open_angle( true_beam_daughter_startPx->at(pi0_idx), true_beam_daughter_startPy->at(pi0_idx),
+                                         true_beam_daughter_startPz->at(pi0_idx), true_beam_Pi0_decay_startPx->at(idx+1),
+                                         true_beam_Pi0_decay_startPy->at(idx+1), true_beam_Pi0_decay_startPz->at(idx+1) );
+  hists.th1_hists["hGammaDiff"] -> Fill( gamma1_open_angle - gamma2_open_angle );
+  hists.th2_hists["hGammaPi0Angle"] -> Fill( gamma1_open_angle*TMath::RadToDeg(), gamma2_open_angle*TMath::RadToDeg() );
+
+  // pi0 angle wrt incoming pi+
+  double true_pi0_angle = open_angle( true_beam_endPx, true_beam_endPy, true_beam_endPz,
+                                 true_beam_daughter_startPx->at(pi0_idx), true_beam_daughter_startPy->at(pi0_idx),
+                                 true_beam_daughter_startPz->at(pi0_idx) );
+  hists.th2_hists["hPi0TrueCalc"] -> Fill( cos( pi0_angle( pi0 ) ), cos( true_pi0_angle ) );
+  hists.th1_hists["hPi0CalcAngleDiff"] -> Fill( cos( pi0_angle( pi0 ) ) - cos( true_pi0_angle ) );
+}
+
+// ............................................................................
+void plot_all_pi0( pi0_proxy& pi0, double pi0_energy, Histograms& hists, size_t idx ) {
+
+  double beam_end_pos = utils::Distance(true_beam_endX, true_beam_endY, true_beam_endZ);
+  double gamma_pos1 = utils::Distance(true_beam_Pi0_decay_startX->at(idx), true_beam_Pi0_decay_startY->at(idx),
+                                      true_beam_Pi0_decay_startZ->at(idx));
+  double gamma_pos2 = utils::Distance(true_beam_Pi0_decay_startX->at(idx+1), true_beam_Pi0_decay_startY->at(idx+1),
+                                      true_beam_Pi0_decay_startZ->at(idx+1));
+
+  hists.th1_hists["hGammaOpenAngle"] -> Fill( pi0.open_angle );
+  hists.th1_hists["hLeadGammaP"] -> Fill( std::max( pi0.energy.first, pi0.energy.second ) );
+  hists.th1_hists["hSubLeadGammaP"] -> Fill( std::min( pi0.energy.first, pi0.energy.second ) );
+  hists.th2_hists["hGammaR"] -> Fill( gamma_pos1-beam_end_pos, gamma_pos2-beam_end_pos );
+  hists.th2_hists["hGammaLen"] -> Fill( true_beam_Pi0_decay_len->at(idx), true_beam_Pi0_decay_len->at(idx+1) );
+  hists.th2_hists["hPi0EGammaOpenAngle"] -> Fill( TMath::RadToDeg()*pi0.open_angle, pi0_energy );
+  hists.th2_hists["hGammaP"] -> Fill( std::max( pi0.energy.first, pi0.energy.second ),
+                                      std::min( pi0.energy.first, pi0.energy.second ) );
+
+}
+
+// ............................................................................
+std::map<int, double> daughter_pi0_energy( Histograms& hists ) {
+
+  std::map<int, double> daughter_pi0_energy_map;
+  double pi0_mass = utils::pdg::pdg2mass( utils::pdg::kPdgPi0 );
+
+  for( size_t i = 0; i < true_beam_daughter_PDG->size(); i++ ) {
+    // Only look at pi0
+    if( true_beam_daughter_PDG->at(i) != utils::pdg::kPdgPi0 ) continue;
+
+    // Plot the daughter pi0
+    double daughter_pi0_energy = utils::CalculateE( true_beam_daughter_startP->at( i ) * 1.e3, pi0_mass );
+    daughter_pi0_energy_map[true_beam_daughter_ID->at(i)] = daughter_pi0_energy;
+
+    hists.th1_hists["hPi0E"]->Fill( daughter_pi0_energy );
+    hists.th2_hists["hPiPPi0P"] -> Fill( true_beam_endP*1.e3, true_beam_daughter_startP->at( i )*1.e3 );
+    if( true_daughter_nPi0 == 1 ) {
+      hists.th2_hists["hPiP1Pi0P"] -> Fill( true_beam_endP*1.e3, true_beam_daughter_startP->at( i )*1.e3 );
+    }
+  }
+
+  return daughter_pi0_energy_map;
+
+}
+
+// ............................................................................
+double open_angle( double px1, double py1, double pz1, double px2, double py2, double pz2 ) {
+
+  TVector3 in( px1, py1, pz1 );
+  TVector3 out( px2, py2, pz2 );
+  // Angle from dot product definition
+  return in.Angle( out );
+}
+
+// ............................................................................
+void clean_pointers() {
 
   // Clean up
   delete true_beam_endProcess;
@@ -206,21 +338,14 @@ void run_pi0_mc_xsec( std::string in_file, Histograms &hists ) {
   delete true_beam_Pi0_decay_startY;
   delete true_beam_Pi0_decay_startZ;
   delete true_beam_Pi0_decay_len;
-  proc_file -> Close();
 
-}
-
-double open_angle( double px1, double py1, double pz1, double px2, double py2, double pz2 ) {
-
-  TVector3 in( px1, py1, pz1 );
-  TVector3 out( px2, py2, pz2 );
-  // Angle from dot product definition
-  return in.Angle( out );
 }
 
 int main() {
-
-  std::string input_file = "../../../pionana_Prod4_mc_1GeV_1_14_21.root";
+  /// 1 GeV 228k events
+//  std::string input_file = "../../../pionana_Prod4_mc_1GeV_1_14_21.root";
+  /// 2GeV 2.6k events
+  std::string input_file = "../../../pduneana_2gev_n2590.root";
   TString output_file = "out.root";
   std::string hists_config = "../hists.json";
 
